@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="select_dialog_items">
+		<item>Select the control mode in the menu</item>
+		<item>Select the speed value in the menu</item>
+		<item>Press the button to start or stop</item>
+		<item>Incline the phone to move or change direction</item>
+		<item>Press the button to move or change direction</item>
+</string-array>
+</resources>
