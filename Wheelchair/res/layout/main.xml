@@ -1,109 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bac"
+    android:gravity="top"
     android:keepScreenOn="true"
-    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:background="@drawable/bac">
-    <ImageView
-        android:id="@+id/up"
-        android:src="@drawable/fang001"
-        android:contentDescription="@string/desc"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-    />
+    tools:context=".wheelchair.WheelchairActivity" >
+
     <ImageView
         android:id="@+id/left"
-        android:src="@drawable/fang002"
-        android:contentDescription="@string/desc"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-    />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/fang002" />
+    
+    <ImageView
+        android:id="@+id/up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/fang001" />
+
     <ImageView
         android:id="@+id/down"
-        android:src="@drawable/fang003"
-        android:contentDescription="@string/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"       
-    />
+        android:contentDescription="@string/desc"
+        android:src="@drawable/fang003" />
+
     <ImageView
         android:id="@+id/right"
-        android:src="@drawable/fang004"
-        android:contentDescription="@string/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"        
-    />
-        <ImageView
-        android:id="@+id/showSpeed"
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
         android:contentDescription="@string/desc"
-        /> 
-    <ImageView 
-        android:id="@+id/panel"
-        android:src="@drawable/panel"
-        android:contentDescription="@string/desc"
-        android:layout_centerInParent="true"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        />
-    <ImageView 
-        android:id="@+id/compass_degree"
-        android:src="@drawable/bg3"
-        android:contentDescription="@string/desc"
-        android:layout_centerInParent="true"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        />
+        android:src="@drawable/fang004" />
+
     <ImageView
-        android:id="@+id/help"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentLeft="true"
+        android:id="@+id/controlpanel"
+        android:layout_width="90dp"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_margin="30dp"
         android:contentDescription="@string/desc"
-        android:src="@drawable/help" 
-         />
+        android:src="@drawable/controlpanel" />
+
     <ImageView
-        android:id="@+id/ring"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="30dp"
-        android:contentDescription="@string/desc" 
-        android:src="@drawable/ring"
-        />
-     <ImageView
-        android:id="@+id/gps"
+        android:id="@+id/acceleration"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="30dp"
         android:contentDescription="@string/desc"
-        android:src="@drawable/gps"
-        
-        />
-  <!-- <com.baidu.mapapi.map.MapView
+        android:src="@drawable/acceleration" />
+    <!--
+       <com.baidu.mapapi.map.MapView
                     android:id="@+id/bmapsView"  
                     android:layout_width="fill_parent"  
                     android:layout_height="fill_parent"  
-                    android:clickable="true" />   --> 
+                    android:clickable="true" />
+    -->
+ 	<ImageView
+        android:id="@+id/decelration"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="30dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/deceleration" />
+ 	
+    <ImageView
+        android:id="@+id/showSpeed"
+        android:layout_width="070dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/desc" />
 
+    <ImageView
+        android:id="@+id/compass_degree"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="30dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bg3" />
 
 </RelativeLayout>

@@ -106,7 +106,7 @@ public class WheelchairActivity extends Activity {
 	public static final int Item5=Menu.FIRST+5;
 	public static final int SPEED=5;
 
-	public int speedChange=0;              //判断是加速与减速
+	public int speedChange=-1;              //判断是加速与减速
 	
 	public boolean alertJudge=false;
 	public int motionMode=0;         //判断采用哪种运行模式
@@ -134,19 +134,22 @@ public class WheelchairActivity extends Activity {
     private float lastAccZ = 0;
 	
 	//指南针
-	private float now_compass=0.0f;
-	private float last_compass=0.0f;
+ // record the compass picture angle turned
+    private float currentDegree = 0f;
 	private RotateAnimation rotateAnimation=null;
 	private ImageView bg=null;
 	
 	//主界面上的按钮
 	private ImageView showSpeed=null;
-	private ImageView gps=null;
+//	private ImageView gps=null;
+	private ImageView acceleration=null;
+	private ImageView deceleration=null;
 	private ImageView ring=null;
-	private ImageView help=null;
+	private ImageView controlpanel=null;
 	public Bitmap bitmap_ring=null;
-	public Bitmap bitmap_gps=null; 
-	public Bitmap bitmap_help=null;
+	public Bitmap bitmap_acceleration=null;
+	public Bitmap bitmap_deceleration=null; 
+	public Bitmap bitmap_controlpanel=null;
 	
 	private ImageView up=null;
 	private ImageView down=null;
@@ -193,7 +196,7 @@ public class WheelchairActivity extends Activity {
         locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if(!locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER))
         {
-        	Toast.makeText(this, "GPS has already closed!Please open it handly!", 
+        	Toast.makeText(this, "GPS has already closed!Please open it manually!", 
         			Toast.LENGTH_SHORT).show();
         }
         else
@@ -234,14 +237,18 @@ public class WheelchairActivity extends Activity {
         bg=(ImageView)findViewById(R.id.compass_degree);
         
         //UI界面
-        showSpeed=(ImageView)findViewById(R.id.showSpeed);                     
-        gps=(ImageView)findViewById(R.id.gps);
-        ring=(ImageView)findViewById(R.id.ring);
-        help=(ImageView)findViewById(R.id.help);
-        bitmap_ring=((BitmapDrawable)(ring.getDrawable())).getBitmap();
-        bitmap_gps=((BitmapDrawable)(gps.getDrawable())).getBitmap();
-        bitmap_help=((BitmapDrawable)(help.getDrawable())).getBitmap();
-        
+        showSpeed=(ImageView)findViewById(R.id.showSpeed);   
+        acceleration=(ImageView)findViewById(R.id.acceleration);  
+        deceleration=(ImageView)findViewById(R.id.decelration);   
+//        gps=(ImageView)findViewById(R.id.gps);
+//        ring=(ImageView)findViewById(R.id.ring);
+        controlpanel=(ImageView)findViewById(R.id.controlpanel);
+//        bitmap_ring=((BitmapDrawable)(ring.getDrawable())).getBitmap();
+//        bitmap_gps=((BitmapDrawable)(gps.getDrawable())).getBitmap();
+        bitmap_controlpanel=((BitmapDrawable)(controlpanel.getDrawable())).getBitmap();
+        bitmap_acceleration=((BitmapDrawable)(acceleration.getDrawable())).getBitmap();
+        bitmap_deceleration=((BitmapDrawable)(deceleration.getDrawable())).getBitmap();
+
         up=(ImageView)findViewById(R.id.up);
         down=(ImageView)findViewById(R.id.down);
         left=(ImageView)findViewById(R.id.left);
@@ -259,82 +266,150 @@ public class WheelchairActivity extends Activity {
         mGestureDetector = new GestureDetector(this, new MyGestureListener(this, mHandler)); 
         
         //按钮调用离线语音识别控制
-	    ring.setOnClickListener(new OnClickListener()
-	    {
-	
-				public void onClick(View v) {
-					// TODO Auto-generated method stub						
-					Intent intent=new Intent();
-					intent.setClass(WheelchairActivity.this, PocketSphinxDemo.class);
-					WheelchairActivity.this.startActivity(intent);
-				}
-	     	
-	    });
-	    ring.setOnTouchListener(new OnTouchListener()
-	    {
-	
-				public boolean onTouch(View v, MotionEvent event) {
-					// TODO Auto-generated method stub
-					if(bitmap_ring.getPixel((int)(event.getX()), (int)(event.getY()))==0)
-					{						
-						return true;
-					}
-					return false;
-				}
-	     	
-	    });
-	    
-	   	gps.setOnLongClickListener(new OnLongClickListener()
-	    {
-				public boolean onLongClick(View v) {
-					// TODO Auto-generated method stub
-					Intent intent=new Intent();
-					intent.putExtra("sendPhoneNumber", sendPhoneNumber);
-					intent.putExtra("sendMsgJudge", "NonSendSMS");
-					intent.putExtra("double_latitude", mlatitude+"");
-					intent.putExtra("double_longtitude", mlongtitude+"");
-//					intent.setClass(WheelchairActivity.this, OfflineMapActivity.class);
-//					intent.setClass(WheelchairActivity.this, MapDemoActivity.class);
+//	    ring.setOnClickListener(new OnClickListener()
+//	    {
+//	
+//				public void onClick(View v) {
+//					// TODO Auto-generated method stub						
+//					Intent intent=new Intent();
+//					intent.setClass(WheelchairActivity.this, PocketSphinxDemo.class);
 //					WheelchairActivity.this.startActivity(intent);
-					return true;
-				}	     	
-	    });
-	   	gps.setOnClickListener(new OnClickListener()
-	   	{
-
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-/*				speech="您现在位于"+strInfo;
-				mTtsb.speak(speech, TextToSpeechBeta.QUEUE_ADD, null);*/
-//				if(mLocation!=null)
-//					{
-					    Toast.makeText(WheelchairActivity.this, mlatitude+" "+mlongtitude+" "+strInfo, 
-					    	Toast.LENGTH_LONG).show();
-					    sendPhoneNumber = "15902739519";
-//					    sendSMS(sendPhoneNumber.trim(),"你亲友当前可能遇到危险，经纬度位置："
-//					            +mlongtitude+"、"+mlatitude+",请速联系确认");
-//					    ScreenShot.shoot(WheelchairActivity.this);
-//					    sendMMS(sendPhoneNumber, "你亲友当前可能遇到危险，附件为出事位置，" +
-//					    		"请速与之联系");
-					    
+//				}
+//	     	
+//	    });
+//	    ring.setOnTouchListener(new OnTouchListener()
+//	    {
+//	
+//				public boolean onTouch(View v, MotionEvent event) {
+//					// TODO Auto-generated method stub
+//					if(bitmap_ring.getPixel((int)(event.getX()), (int)(event.getY()))==0)
+//					{						
+//						return true;
 //					}
+//					return false;
+//				}
+//	     	
+//	    });
+	    acceleration.setOnClickListener(new OnClickListener()
+	    {
+
+			public void onClick(View arg0) {
+				if(speedChange==4)
+					Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
+				else{
+					speedChange+=1;
+					sendData(5+"");
+					showSpeed(speedChange);
+				}
 			}
-	   		
-	   	});
+	    	
+	    });
+	    deceleration.setOnClickListener(new OnClickListener()
+	    {
+
+			public void onClick(View arg0) {
+				if(speedChange==-1)
+					Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
+				else{
+					speedChange-=1;
+					sendData(5+"");
+					showSpeed(speedChange);
+				}
+			}
+	    	
+	    });
+//	   	gps.setOnLongClickListener(new OnLongClickListener()
+//	    {
+//				public boolean onLongClick(View v) {
+//					// TODO Auto-generated method stub
+//					Intent intent=new Intent();
+//					intent.putExtra("sendPhoneNumber", sendPhoneNumber);
+//					intent.putExtra("sendMsgJudge", "NonSendSMS");
+//					intent.putExtra("double_latitude", mlatitude+"");
+//					intent.putExtra("double_longtitude", mlongtitude+"");
+////					intent.setClass(WheelchairActivity.this, OfflineMapActivity.class);
+////					intent.setClass(WheelchairActivity.this, MapDemoActivity.class);
+////					WheelchairActivity.this.startActivity(intent);
+//					return true;
+//				}	     	
+//	    });
+//	   	gps.setOnClickListener(new OnClickListener()
+//	   	{
+//
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+///*				speech="您现在位于"+strInfo;
+//				mTtsb.speak(speech, TextToSpeechBeta.QUEUE_ADD, null);*/
+////				if(mLocation!=null)
+////					{
+//					    Toast.makeText(WheelchairActivity.this, mlatitude+" "+mlongtitude+" "+strInfo, 
+//					    	Toast.LENGTH_LONG).show();
+//					    sendPhoneNumber = "13296628214";
+////					    sendSMS(sendPhoneNumber.trim(),"你亲友当前可能遇到危险，经纬度位置："
+////					            +mlongtitude+"、"+mlatitude+",请速联系确认");
+////					    ScreenShot.shoot(WheelchairActivity.this);
+////					    sendMMS(sendPhoneNumber, "你亲友当前可能遇到危险，附件为出事位置，" +
+////					    		"请速与之联系");
+//					    
+////					}
+//			}
+//	   		
+//	   	});
 	   	   
-	   	help.setOnClickListener(new OnClickListener()
+	   	controlpanel.setOnClickListener(new OnClickListener()
 	    {
 	
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					new AlertDialog.Builder(WheelchairActivity.this)
-			        .setIcon(R.drawable.help)
-					.setTitle(R.string.HELP)
+			        .setIcon(R.drawable.controlpanel)
+					.setTitle(R.string.controlOptions)
 					.setItems(R.array.select_dialog_items, 
 							new DialogInterface.OnClickListener() {
 						
 						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
+							switch (which) {
+				               case 0:  motionMode=2;
+						           		if(!alertJudge)
+						           		{
+						           			alertShow();
+						           		}
+						           		alertJudge=true;
+				                  break;
+				               case 1:  motionMode=3;
+				       					Intent intent=new Intent(WheelchairActivity.this, GravitySensingActivity.class);
+				       					startActivity(intent);
+				                  break;
+				               case 2:  motionMode=4;
+						               	if(!alertJudge)
+						           		{
+						           			alertShow();
+						           		}
+						           		alertJudge=true;
+				                  break;
+				               case 3:  motionMode=5;
+						           		if(!alertJudge)
+						           		{
+						           			alertShow();
+						           		}
+						           		alertJudge=true;
+						           		
+						           		//语音识别检测
+						           		
+					                   PackageManager pm = getPackageManager(); 
+					                   List activities = pm.queryIntentActivities( 
+					                   new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0); 
+					                   if(activities.size() != 0) {  
+					                   	startVoiceRecognition();
+					                   }else{
+					                   	Toast.makeText(WheelchairActivity.this, "Recognizer not present", Toast.LENGTH_SHORT).show();
+					                   }  
+					                  break;
+				               case 4:  //TODO: Insert Baidu map code here
+					                  break;
+				               default:
+				                    break;
+				            }
 						}
 					})
 					.show();
@@ -518,7 +593,7 @@ public class WheelchairActivity extends Activity {
 							 public void onClick(DialogInterface dialog, int which) {
 								 // TODO Auto-generated method stub
 								 Log.d(TAG, "yes");
-								 sendPhoneNumber = "15902739519";
+								 sendPhoneNumber = "13296628214";
 								 sendSMS(sendPhoneNumber.trim(),"你亲友当前可能遇到危险，经纬度位置："
 									        +mlongtitude+"、"+mlatitude+",请速联系确认");
 								 postive = 1;
@@ -594,18 +669,26 @@ public class WheelchairActivity extends Activity {
 		public void onSensorChanged(SensorEvent event) {
 			// TODO Auto-generated method stub
 //			Log.d(TAG, "ORI");
-			now_compass=event.values[SensorManager.DATA_X];  
-			direction_TURN=event.values[SensorManager.DATA_Y];
-			direction_UP=event.values[SensorManager.DATA_Z];
-			
-			now_compass+=90;
-			if(Math.abs(now_compass-last_compass)<1) {
-				return;
-			}
-			else if(now_compass>180) {
-				now_compass-=360;
-			}
-			rotate(-now_compass);
+			// get the angle around the z-axis rotated
+	        float degree = Math.round(event.values[0])+90;
+	 	 
+	        // create a rotation animation (reverse turn degree degrees)
+	        RotateAnimation ra = new RotateAnimation(
+	                currentDegree, 
+	                -degree,
+	                Animation.RELATIVE_TO_SELF, 0.5f, 
+	                Animation.RELATIVE_TO_SELF,
+	                0.5f);
+	 
+	        // how long the animation will take place
+	        ra.setDuration(210);
+	 
+	        // set the animation after the end of the reservation status
+	        ra.setFillAfter(true);
+	 
+	        // Start the animation
+	        bg.startAnimation(ra);
+	        currentDegree = -degree;
 		}
 		
 	};
@@ -776,16 +859,6 @@ public class WheelchairActivity extends Activity {
   //}
 	///////////////////////////////////////////////////////////////////////////////////////
 		  
-    private void rotate(float direction)
-    {
-    	//Log.d(TAG, "Rotate");
-		rotateAnimation = new RotateAnimation(last_compass, now_compass, Animation.RELATIVE_TO_SELF, 0.5f, 
-				 Animation.RELATIVE_TO_SELF, 0.5f);
-		rotateAnimation.setDuration(200);
-		rotateAnimation.setFillAfter(true);  		
-		bg.setAnimation(rotateAnimation);
-		last_compass = direction;
-    }
 
 	/**
 	 * sendData
@@ -867,18 +940,18 @@ public class WheelchairActivity extends Activity {
 		// TODO Auto-generated method stub
 		Log.d(TAG, "On Create Options Menu");
 		super.onCreateOptionsMenu(menu);
-		menu.add(1,Item0, 0, "Acceleration");
-		menu.add(1,Item1, 0, "Deceleration");
-		menu.add(0,Item2, 0, "Touch Sensing");
-		menu.add(0,Item3, 0, "Gravity Sensing");
-		menu.add(2,Item4, 0, "Gesture Control");
-		menu.add(2,Item5, 0, "Voice Control");
+		menu.add(1,Item0, 0, "Help");
+		menu.add(1,Item1, 0, "Settings");
+//		menu.add(0,Item2, 0, "Touch Sensing");
+//		menu.add(0,Item3, 0, "Gravity Sensing");
+//		menu.add(2,Item4, 0, "Gesture Control");
+//		menu.add(2,Item5, 0, "Voice Control");
 		menu.findItem(Item0).setIcon(R.drawable.speed);
 		menu.findItem(Item1).setIcon(R.drawable.slow);
-		menu.findItem(Item2).setIcon(drawable.ic_menu_slideshow);
-		menu.findItem(Item3).setIcon(drawable.ic_menu_compass);
-		menu.findItem(Item4).setIcon(drawable.ic_menu_directions);
-		menu.findItem(Item5).setIcon(drawable.btn_radio);		 		
+//		menu.findItem(Item2).setIcon(drawable.ic_menu_slideshow);
+//		menu.findItem(Item3).setIcon(drawable.ic_menu_compass);
+//		menu.findItem(Item4).setIcon(drawable.ic_menu_directions);
+//		menu.findItem(Item5).setIcon(drawable.btn_radio);		 		
 		return true;		
 	}
 
@@ -912,40 +985,28 @@ public class WheelchairActivity extends Activity {
 	
 	private void actionClickMenuItem0()
 	{
-		Log.d(TAG, "Acceleration");
-//		if(speedChange<5)
-//		{
-//			speedChange++;
-//			singal=5;
-//			sendData(singal+"");
-//			showSpeed(speedChange);
-//		}
-		if(speedChange==0){
-			speedChange+=4;
-			sendData(5+"");
-			showSpeed(speedChange);
-		}
-		else
-			Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
+		Log.d(TAG, "Help");
+		//Accelerate/Decelerate/Stop using the + and - buttons at any time
+		//Control Methods
+			//
+			//Select the control method from the control panel
+			//Touch Sensing
+				//Touch Left/Right/Forward/Backward buttons to navigate
+			//Gravity Sensing
+				//Tilt the phone to go forward/left/right/backward
+			//Sip & Puff
+				//Swipe left/right/up/down for gesture control
+			//Voice Control
+				//Speak "left"/"right" at the start of the beep
+		
+		//
+		
 	}
 	
 	private void actionClickMenuItem1()
 	{
-		Log.d(TAG, "Deceleration");		
-//		if(speedChange>0)
-//		{
-//			speedChange--;
-//			singal=8;
-//			sendData(singal+"");
-//			showSpeed(speedChange);
-//		}
-		if(speedChange==4){
-			speedChange-=4;
-			sendData(5+"");
-			showSpeed(speedChange);
-		}
-		else
-			Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
+		Log.d(TAG, "Settings");		
+
 	}
 	
 	private void actionClickMenuItem2()
@@ -1031,6 +1092,8 @@ public class WheelchairActivity extends Activity {
     	Log.d(TAG, "Show Speed");
 		switch(speedChange)
 		{
+		case -1: showSpeed.setImageDrawable(getResources().getDrawable(R.drawable.a1));
+			break;
 		case 0:
 			showSpeed.setImageDrawable(getResources().getDrawable(R.drawable.a2));
 			break;

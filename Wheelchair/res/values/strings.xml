@@ -4,7 +4,7 @@
     <string name="hello">Hello World, WheelchairActivity!</string>
     <string name="app_name">Wheelchair</string>
     <string name="desc">Image</string>
-    <string name="HELP">HELP</string>
+    <string name="controlOptions">Control Options</string>
     <string name="gravity_sensor">Gravity Sensing Control</string>
     <string name="map">Wheelchair Map</string>
     <string name="input">Input phone number!</string>
