@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, WheelchairActivity!</string>
+    <string name="app_name">Wheelchair</string>
+    <string name="desc">Image</string>
+    <string name="controlOptions">Control Options</string>
+    <string name="gravity_sensor">Gravity Sensing Control</string>
+    <string name="map">Wheelchair Map</string>
+    <string name="input">Input phone number!</string>
+    
+    <color name="blue">#EEE</color>
+    <string name="performance_text">0.00 seconds 0.00 xRT</string>
+</resources>

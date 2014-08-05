@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="select_dialog_items">
+		<item>Touch Sensing</item>
+		<item>Gravity Sensing</item>
+		<item>Sip-and-Puff</item>
+		<item>Voice Control</item>
+		<item>GPS Navigation</item>
+</string-array>
+</resources>
