@@ -79,8 +79,8 @@ public class WheelchairActivity extends Activity {
 	private static final String TAG="WheelchairActivity";
 	
 	public static final int STOP = 0;
-	public static final int FORWARD = 2;
-	public static final int BACKWARD = 1;
+	public static final int FORWARD = 1;
+	public static final int REVERSE = 2;
 	public static final int LEFT = 3;
 	public static final int RIGHT = 4;
 	public static final int SPEED_UP = 5;
@@ -104,7 +104,6 @@ public class WheelchairActivity extends Activity {
 	public static final int Item3=Menu.FIRST+3;
 	public static final int Item4=Menu.FIRST+4;
 	public static final int Item5=Menu.FIRST+5;
-	public static final int SPEED=5;
 
 	public int speedChange=-1;              //判断是加速与减速
 	
@@ -118,9 +117,6 @@ public class WheelchairActivity extends Activity {
 	private Sensor mAccSensor=null;
 	private Sensor mProSensor=null;
 	private Sensor mMagSensor=null;
-	private float direction_TURN=0;
-	private float direction_UP=0;
-	private boolean directionJudge=true;
 	private PowerManager pm;
 	private WakeLock mWakeLock; //电源管理wackLock对象
 	
@@ -141,7 +137,7 @@ public class WheelchairActivity extends Activity {
 	
 	//主界面上的按钮
 	private ImageView showSpeed=null;
-//	private ImageView gps=null;
+	private ImageView gps=null;
 	private ImageView acceleration=null;
 	private ImageView deceleration=null;
 	private ImageView ring=null;
@@ -298,7 +294,7 @@ public class WheelchairActivity extends Activity {
 					Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
 				else{
 					speedChange+=1;
-					sendData(5+"");
+					sendData(SPEED_UP+"");
 					showSpeed(speedChange);
 				}
 			}
@@ -312,7 +308,7 @@ public class WheelchairActivity extends Activity {
 					Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
 				else{
 					speedChange-=1;
-					sendData(5+"");
+					sendData(SLOW_DOWN+"");
 					showSpeed(speedChange);
 				}
 			}
@@ -395,7 +391,6 @@ public class WheelchairActivity extends Activity {
 						           		alertJudge=true;
 						           		
 						           		//语音识别检测
-						           		
 					                   PackageManager pm = getPackageManager(); 
 					                   List activities = pm.queryIntentActivities( 
 					                   new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0); 
@@ -447,7 +442,7 @@ public class WheelchairActivity extends Activity {
 							&& bitmap_right.getPixel(X, Y)==0)
 					{
 						Log.d("TAG", "Move backward");
-						sendData(BACKWARD+"");
+						sendData(REVERSE+"");
 						Toast.makeText(mContext, "REVERSE", Toast.LENGTH_SHORT).show();
 					}
 					else if(bitmap_up.getPixel(X,Y )==0 
@@ -916,8 +911,8 @@ public class WheelchairActivity extends Activity {
 				sendData(FORWARD+"");
 				Toast.makeText(mContext, "FORWARD", Toast.LENGTH_SHORT).show();
 				break;
-			case BACKWARD:
-				sendData(BACKWARD+"");
+			case REVERSE:
+				sendData(REVERSE+"");
 				Toast.makeText(mContext, "REVERSE", Toast.LENGTH_SHORT).show();
 				break;
 			case LEFT:
@@ -1026,11 +1021,11 @@ public class WheelchairActivity extends Activity {
 		motionMode="Gravity Sensing";
 		Intent intent=new Intent(this, GravitySensingActivity.class);
 		startActivity(intent);
-//		if(!alertJudge)
-//		{
-//			alertShow();
-//		}
-//		alertJudge=true;		
+		if(!alertJudge)
+		{
+			alertShow();
+		}
+		alertJudge=true;		
 	}
 	
 	private void actionClickMenuItem4(){
@@ -1148,7 +1143,7 @@ public class WheelchairActivity extends Activity {
 				}
 				else if(s.equals("后退")){
 					//go backward
-					sendData(BACKWARD+"");
+					sendData(REVERSE+"");
 					Toast.makeText(WheelchairActivity.this, "backward", Toast.LENGTH_SHORT).show();
 					break;
 				}
