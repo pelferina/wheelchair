@@ -45,7 +45,14 @@
         android:contentDescription="@string/desc"
         android:src="@drawable/fang004" /> 
     
-   
+    <ImageView
+        android:id="@+id/stop"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/stop" />
     
     <ImageView
         android:id="@+id/controlpanel"
@@ -93,7 +100,8 @@
         android:layout_height="80dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="10dp"
         android:contentDescription="@string/desc"
         android:src="@drawable/bg3" />
 
