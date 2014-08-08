@@ -49,7 +49,7 @@ public class MyGestureListener extends SimpleOnGestureListener{
 			Log.d(TAG, "Forward");
 		}
 		else if(e1.getY()-e2.getY()<-SWIPE_MIN_DISTANCE&&Math.abs(velocityY)>SWIPE_MIN_VOLECITY){
-			mHandler.obtainMessage(WheelchairActivity.BACKWARD).sendToTarget(); // Backward
+			mHandler.obtainMessage(WheelchairActivity.REVERSE).sendToTarget(); // Backward
 			Toast.makeText(mContext, "backward", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Backward");
 		}		

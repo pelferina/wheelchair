@@ -79,8 +79,8 @@ public class WheelchairActivity extends Activity {
 	private static final String TAG="WheelchairActivity";
 	
 	public static final int STOP = 0;
-	public static final int FORWARD = 2;
-	public static final int BACKWARD = 1;
+	public static final int FORWARD = 1;
+	public static final int REVERSE = 2;
 	public static final int LEFT = 3;
 	public static final int RIGHT = 4;
 	public static final int SPEED_UP = 5;
@@ -104,12 +104,11 @@ public class WheelchairActivity extends Activity {
 	public static final int Item3=Menu.FIRST+3;
 	public static final int Item4=Menu.FIRST+4;
 	public static final int Item5=Menu.FIRST+5;
-	public static final int SPEED=5;
 
 	public int speedChange=-1;              //判断是加速与减速
 	
 	public boolean alertJudge=false;
-	public int motionMode=0;         //判断采用哪种运行模式
+	public String motionMode="";         //判断采用哪种运行模式
 	
 	//传感器设置
 	private SensorManager mSensorManager;
@@ -118,9 +117,6 @@ public class WheelchairActivity extends Activity {
 	private Sensor mAccSensor=null;
 	private Sensor mProSensor=null;
 	private Sensor mMagSensor=null;
-	private float direction_TURN=0;
-	private float direction_UP=0;
-	private boolean directionJudge=true;
 	private PowerManager pm;
 	private WakeLock mWakeLock; //电源管理wackLock对象
 	
@@ -141,7 +137,7 @@ public class WheelchairActivity extends Activity {
 	
 	//主界面上的按钮
 	private ImageView showSpeed=null;
-//	private ImageView gps=null;
+	private ImageView gps=null;
 	private ImageView acceleration=null;
 	private ImageView deceleration=null;
 	private ImageView ring=null;
@@ -239,7 +235,7 @@ public class WheelchairActivity extends Activity {
         //UI界面
         showSpeed=(ImageView)findViewById(R.id.showSpeed);   
         acceleration=(ImageView)findViewById(R.id.acceleration);  
-        deceleration=(ImageView)findViewById(R.id.decelration);   
+        deceleration=(ImageView)findViewById(R.id.deceleration);   
 //        gps=(ImageView)findViewById(R.id.gps);
 //        ring=(ImageView)findViewById(R.id.ring);
         controlpanel=(ImageView)findViewById(R.id.controlpanel);
@@ -298,7 +294,7 @@ public class WheelchairActivity extends Activity {
 					Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
 				else{
 					speedChange+=1;
-					sendData(5+"");
+					sendData(SPEED_UP+"");
 					showSpeed(speedChange);
 				}
 			}
@@ -312,7 +308,7 @@ public class WheelchairActivity extends Activity {
 					Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
 				else{
 					speedChange-=1;
-					sendData(5+"");
+					sendData(SLOW_DOWN+"");
 					showSpeed(speedChange);
 				}
 			}
@@ -369,25 +365,25 @@ public class WheelchairActivity extends Activity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							switch (which) {
-				               case 0:  motionMode=2;
+				               case 0:  motionMode="Touch Sensing";
 						           		if(!alertJudge)
 						           		{
 						           			alertShow();
 						           		}
 						           		alertJudge=true;
 				                  break;
-				               case 1:  motionMode=3;
+				               case 1:  motionMode="Gravity Sensing";
 				       					Intent intent=new Intent(WheelchairActivity.this, GravitySensingActivity.class);
 				       					startActivity(intent);
 				                  break;
-				               case 2:  motionMode=4;
+				               case 2:  motionMode="Sip And Puff";
 						               	if(!alertJudge)
 						           		{
 						           			alertShow();
 						           		}
 						           		alertJudge=true;
 				                  break;
-				               case 3:  motionMode=5;
+				               case 3:  motionMode="Voice Control";
 						           		if(!alertJudge)
 						           		{
 						           			alertShow();
@@ -395,7 +391,6 @@ public class WheelchairActivity extends Activity {
 						           		alertJudge=true;
 						           		
 						           		//语音识别检测
-						           		
 					                   PackageManager pm = getPackageManager(); 
 					                   List activities = pm.queryIntentActivities( 
 					                   new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0); 
@@ -422,7 +417,7 @@ public class WheelchairActivity extends Activity {
 	    {
 	    	public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
-				if(event.getAction()==MotionEvent.ACTION_DOWN && motionMode==2)
+				if(event.getAction()==MotionEvent.ACTION_DOWN && motionMode=="Touch Sensing")
 				{
 					int H=up.getHeight();
 					int X=(int)(event.getX());
@@ -439,16 +434,16 @@ public class WheelchairActivity extends Activity {
 					{
 						Log.d("TAG", "Move forward");
 						sendData(FORWARD+""); 
-						Toast.makeText(mContext, "forward", Toast.LENGTH_SHORT).show();
+						Toast.makeText(mContext, "FORWARD", Toast.LENGTH_SHORT).show();
 					}
 					else if(bitmap_up.getPixel(X, Y)==0 
-							&& bitmap_down.getPixel(X, Y)>0 
+							&& bitmap_down.getPixel(X, Y)<0 
 							&& bitmap_left.getPixel(X, Y)==0 
 							&& bitmap_right.getPixel(X, Y)==0)
 					{
 						Log.d("TAG", "Move backward");
-						sendData(BACKWARD+"");
-						Toast.makeText(mContext, "backward", Toast.LENGTH_SHORT).show();
+						sendData(REVERSE+"");
+						Toast.makeText(mContext, "REVERSE", Toast.LENGTH_SHORT).show();
 					}
 					else if(bitmap_up.getPixel(X,Y )==0 
 							&& bitmap_down.getPixel(X, Y)==0 
@@ -457,7 +452,7 @@ public class WheelchairActivity extends Activity {
 					{
 						//Log.d("TAG", "Turn left");
 						sendData(LEFT+"");
-						Toast.makeText(mContext, "left", Toast.LENGTH_SHORT).show();
+						Toast.makeText(mContext, "LEFT", Toast.LENGTH_SHORT).show();
 					}
 					else if(bitmap_up.getPixel(X,Y )==0 
 							&& bitmap_down.getPixel(X, Y)==0 
@@ -466,16 +461,16 @@ public class WheelchairActivity extends Activity {
 					{
 						//Log.d("TAG", "Turn right");
 						sendData(RIGHT+"");
-						Toast.makeText(mContext, "right", Toast.LENGTH_SHORT).show();
+						Toast.makeText(mContext, "RIGHT", Toast.LENGTH_SHORT).show();
+					}
+					else
+					{
+						Log.d("TAG","Stop");
+						sendData(STOP+"");
+						Toast.makeText(mContext, "STOP", Toast.LENGTH_SHORT).show();
 					}
 				}
-				else if(event.getAction()==MotionEvent.ACTION_UP && motionMode==2)
-				{
-					Log.d("TAG","Stop");
-					sendData(STOP+"");
-					Toast.makeText(mContext, "stop", Toast.LENGTH_SHORT).show();
-				}
-				else if(motionMode==4)
+				else if(motionMode=="Sip And Puff")
 				{
 					return mGestureDetector.onTouchEvent(event);
 				}
@@ -550,7 +545,7 @@ public class WheelchairActivity extends Activity {
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
 	    // TODO Auto-generated method stub
-		if(motionMode==4){
+		if(motionMode=="Sip And Puff"){
 			return mGestureDetector.onTouchEvent(event); 
 		}
 		else{
@@ -910,23 +905,23 @@ public class WheelchairActivity extends Activity {
 			switch(msg.what){
 			case STOP:
 				sendData(STOP+"");
-				Toast.makeText(mContext, "stop", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "STOP", Toast.LENGTH_SHORT).show();
 				break;
 			case FORWARD:
 				sendData(FORWARD+"");
-				Toast.makeText(mContext, "forward", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "FORWARD", Toast.LENGTH_SHORT).show();
 				break;
-			case BACKWARD:
-				sendData(BACKWARD+"");
-				Toast.makeText(mContext, "backward", Toast.LENGTH_SHORT).show();
+			case REVERSE:
+				sendData(REVERSE+"");
+				Toast.makeText(mContext, "REVERSE", Toast.LENGTH_SHORT).show();
 				break;
 			case LEFT:
 				sendData(LEFT+"");
-				Toast.makeText(mContext, "left", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "LEFT", Toast.LENGTH_SHORT).show();
 				break;
 			case RIGHT:
 				sendData(RIGHT+"");
-				Toast.makeText(mContext, "right", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "RIGHT", Toast.LENGTH_SHORT).show();
 				break;
 			}		
 		}		
@@ -1012,7 +1007,7 @@ public class WheelchairActivity extends Activity {
 	private void actionClickMenuItem2()
 	{
 		Log.d(TAG, "Touch Sensing");
-		motionMode=2;
+		motionMode="Touch Sensing";
 		if(!alertJudge)
 		{
 			alertShow();
@@ -1023,19 +1018,19 @@ public class WheelchairActivity extends Activity {
 	private void actionClickMenuItem3()
 	{
 		Log.d(TAG, "Gravity Sensing");
-		motionMode=3;
+		motionMode="Gravity Sensing";
 		Intent intent=new Intent(this, GravitySensingActivity.class);
 		startActivity(intent);
-//		if(!alertJudge)
-//		{
-//			alertShow();
-//		}
-//		alertJudge=true;		
+		if(!alertJudge)
+		{
+			alertShow();
+		}
+		alertJudge=true;		
 	}
 	
 	private void actionClickMenuItem4(){
-		Log.d(TAG, "Gesture Control");
-		motionMode=4;
+		Log.d(TAG, "Sip And Puff");
+		motionMode="Sip And Puff";
 		if(!alertJudge)
 		{
 			alertShow();
@@ -1045,7 +1040,7 @@ public class WheelchairActivity extends Activity {
 	
 	private void actionClickMenuItem5(){
 		Log.d(TAG, "Voice Control");
-		motionMode=5;
+		motionMode="Voice Control";
 		if(!alertJudge)
 		{
 			alertShow();
@@ -1148,7 +1143,7 @@ public class WheelchairActivity extends Activity {
 				}
 				else if(s.equals("后退")){
 					//go backward
-					sendData(BACKWARD+"");
+					sendData(REVERSE+"");
 					Toast.makeText(WheelchairActivity.this, "backward", Toast.LENGTH_SHORT).show();
 					break;
 				}

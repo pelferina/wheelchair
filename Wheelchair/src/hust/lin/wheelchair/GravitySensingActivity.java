@@ -35,7 +35,7 @@ public class GravitySensingActivity extends Activity {
 	private int speedState;
 	private static final int STOP = 0;
 	private static final int FORWARD = 2;
-	private static final int BACKWARD = 1;
+	private static final int REVERSE = 1;
 	private static final int LEFT = 3;
 	private static final int RIGHT = 4;
     private static final int ANGLEF1=15;
@@ -279,7 +279,7 @@ public class GravitySensingActivity extends Activity {
                         }
                         //加速前进
                         else if(fb>ANGLEF2 && fb<ANGLEF3 && Math.abs(lr)<ANGLEL){
-                        	Log.d(TAG, "forward speed");
+                        	Log.d(TAG, "forward fast");
                         	mControl = 2; 
                         	if(speedState==0){
                         		speedState += 4;
@@ -290,24 +290,24 @@ public class GravitySensingActivity extends Activity {
                         }
                         //慢速后退
                         else if(fb<-ANGLEF1 && fb>=-ANGLEF2 && Math.abs(lr)<ANGLEL){
-                        	Log.d(TAG, "backward slow");
+                        	Log.d(TAG, "reverse slow");
                         	mControl = -2;
                         	if(speedState==4){
                         		speedState -= 4;
                         	    sendData(5+"");
                         	}
-                        	sendData(BACKWARD+"");
+                        	sendData(REVERSE+"");
                         	mDistance--;
                         }
                         //加速后退
                         else if(fb<-ANGLEF2 && fb>-ANGLEF3 && Math.abs(lr)<ANGLEL){
-                        	Log.d(TAG, "backward speed");
+                        	Log.d(TAG, "reverse fast");
                         	mControl = -2;
                         	if(speedState==0){
                         		speedState += 4;
                         	    sendData(5+"");
                         	}
-                        	sendData(BACKWARD+"");
+                        	sendData(REVERSE+"");
                         	mDistance-=2;
                         }
                         //左转

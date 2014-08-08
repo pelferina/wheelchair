@@ -17,7 +17,7 @@
         android:layout_centerVertical="true"
         android:contentDescription="@string/desc"
         android:src="@drawable/fang002" />
-    
+
     <ImageView
         android:id="@+id/up"
         android:layout_width="wrap_content"
@@ -43,8 +43,10 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/desc"
-        android:src="@drawable/fang004" />
-
+        android:src="@drawable/fang004" /> 
+    
+   
+    
     <ImageView
         android:id="@+id/controlpanel"
         android:layout_width="90dp"
@@ -61,34 +63,30 @@
         android:layout_height="80dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="30dp"
+        android:layout_marginLeft="30dp"
         android:contentDescription="@string/desc"
         android:src="@drawable/acceleration" />
-    <!--
-       <com.baidu.mapapi.map.MapView
-                    android:id="@+id/bmapsView"  
-                    android:layout_width="fill_parent"  
-                    android:layout_height="fill_parent"  
-                    android:clickable="true" />
-    -->
- 	<ImageView
-        android:id="@+id/decelration"
+  
+    <ImageView
+        android:id="@+id/deceleration"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="60dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/deceleration" />
+
+        <ImageView
+        android:id="@+id/showSpeed"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="30dp"
-        android:contentDescription="@string/desc"
-        android:src="@drawable/deceleration" />
- 	
-    <ImageView
-        android:id="@+id/showSpeed"
-        android:layout_width="070dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="30dp"
         android:contentDescription="@string/desc" />
-
+        
     <ImageView
         android:id="@+id/compass_degree"
         android:layout_width="80dp"
