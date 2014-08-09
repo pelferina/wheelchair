@@ -432,6 +432,11 @@ public class WheelchairActivity extends Activity {
 							&& bitmap_left.getPixel(X, Y)==0 
 							&& bitmap_right.getPixel(X, Y)==0)
 					{
+						if(speedChange==-1)
+						{
+							speedChange+=1;
+							showSpeed(speedChange);
+						}
 						Log.d("TAG", "Move forward");
 						sendData(FORWARD+""); 
 						Toast.makeText(mContext, "FORWARD", Toast.LENGTH_SHORT).show();
