@@ -35,22 +35,18 @@ public class MyGestureListener extends SimpleOnGestureListener{
 		//Log.d(TAG, "On Fling");
 		if(e1.getX()-e2.getX()>SWIPE_MIN_DISTANCE&&Math.abs(velocityX)>SWIPE_MIN_VOLECITY){			
 			mHandler.obtainMessage(WheelchairActivity.LEFT).sendToTarget(); // Turn left
-			Toast.makeText(mContext, "left", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Left");
 		}
 		else if(e1.getX()-e2.getX()<-SWIPE_MIN_DISTANCE&&Math.abs(velocityX)>SWIPE_MIN_VOLECITY){
 			mHandler.obtainMessage(WheelchairActivity.RIGHT).sendToTarget(); // Turn right
-			Toast.makeText(mContext, "right", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Right");
 		}
 		else if(e1.getY()-e2.getY()>SWIPE_MIN_DISTANCE&&Math.abs(velocityY)>SWIPE_MIN_VOLECITY){
 			mHandler.obtainMessage(WheelchairActivity.FORWARD).sendToTarget(); // Forward
-			Toast.makeText(mContext, "forward", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Forward");
 		}
 		else if(e1.getY()-e2.getY()<-SWIPE_MIN_DISTANCE&&Math.abs(velocityY)>SWIPE_MIN_VOLECITY){
 			mHandler.obtainMessage(WheelchairActivity.REVERSE).sendToTarget(); // Backward
-			Toast.makeText(mContext, "backward", Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Backward");
 		}		
 		return true;
@@ -67,7 +63,6 @@ public class MyGestureListener extends SimpleOnGestureListener{
 	public void onLongPress(MotionEvent e) {
 		// TODO Auto-generated method stub
 		mHandler.obtainMessage(WheelchairActivity.STOP).sendToTarget(); // Stop
-		Toast.makeText(mContext, "stop", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "Stop");
 	}
 	
