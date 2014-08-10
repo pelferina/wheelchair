@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -28,8 +30,11 @@ import android.os.SystemClock;
 import hust.lin.pocketsphinx.PocketSphinxDemo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -188,7 +193,8 @@ public class WheelchairActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); 
         setContentView(R.layout.main);          
-                
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if(!locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER))
         {
@@ -199,6 +205,15 @@ public class WheelchairActivity extends Activity {
         {
         	Toast.makeText(this, "GPS is working...", Toast.LENGTH_LONG).show();
         }
+        try {
+			Toast.makeText(this, createVoicePackage(),Toast.LENGTH_LONG).show();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         criteria=new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setAltitudeRequired(true);
@@ -255,8 +270,8 @@ public class WheelchairActivity extends Activity {
         bitmap_right=((BitmapDrawable)(right.getDrawable())).getBitmap();
         
 	    showSpeed(speedChange);
-	    
-	    alertShow();
+	    showControlOptions();
+//	    alertShow();
         
         //调用滑动识别
         mGestureDetector = new GestureDetector(this, new MyGestureListener(this, mHandler)); 
@@ -290,12 +305,15 @@ public class WheelchairActivity extends Activity {
 	    {
 
 			public void onClick(View arg0) {
-				if(speedChange==4)
-					Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
-				else{
-					speedChange+=1;
-					sendData(SPEED_UP+"");
-					showSpeed(speedChange);
+				if(motionMode!="")
+				{
+					if(speedChange==4)
+						Toast.makeText(WheelchairActivity.this, "Has reached the maximum speed", Toast.LENGTH_SHORT).show();
+					else{
+						speedChange+=1;
+						sendData(SPEED_UP+"");
+						showSpeed(speedChange);
+					}
 				}
 			}
 	    	
@@ -304,12 +322,15 @@ public class WheelchairActivity extends Activity {
 	    {
 
 			public void onClick(View arg0) {
-				if(speedChange==-1)
-					Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
-				else{
-					speedChange-=1;
-					sendData(SLOW_DOWN+"");
-					showSpeed(speedChange);
+				if(motionMode!="")
+				{
+					if(speedChange==-1)
+						Toast.makeText(WheelchairActivity.this, "Has reached the minimum speed", Toast.LENGTH_SHORT).show();
+					else{
+						speedChange-=1;
+						sendData(SLOW_DOWN+"");
+						showSpeed(speedChange);
+					}
 				}
 			}
 	    	
@@ -357,57 +378,7 @@ public class WheelchairActivity extends Activity {
 	
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					new AlertDialog.Builder(WheelchairActivity.this)
-			        .setIcon(R.drawable.controlpanel)
-					.setTitle(R.string.controlOptions)
-					.setItems(R.array.select_dialog_items, 
-							new DialogInterface.OnClickListener() {
-						
-						public void onClick(DialogInterface dialog, int which) {
-							switch (which) {
-				               case 0:  motionMode="Touch Sensing";
-						           		if(!alertJudge)
-						           		{
-						           			alertShow();
-						           		}
-						           		alertJudge=true;
-				                  break;
-				               case 1:  motionMode="Gravity Sensing";
-				       					Intent intent=new Intent(WheelchairActivity.this, GravitySensingActivity.class);
-				       					startActivity(intent);
-				                  break;
-				               case 2:  motionMode="Sip And Puff";
-						               	if(!alertJudge)
-						           		{
-						           			alertShow();
-						           		}
-						           		alertJudge=true;
-				                  break;
-				               case 3:  motionMode="Voice Control";
-						           		if(!alertJudge)
-						           		{
-						           			alertShow();
-						           		}
-						           		alertJudge=true;
-						           		
-						           		//语音识别检测
-					                   PackageManager pm = getPackageManager(); 
-					                   List activities = pm.queryIntentActivities( 
-					                   new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0); 
-					                   if(activities.size() != 0) {  
-					                   	startVoiceRecognition();
-					                   }else{
-					                   	Toast.makeText(WheelchairActivity.this, "Recognizer not present", Toast.LENGTH_SHORT).show();
-					                   }  
-					                  break;
-				               case 4:  //TODO: Insert Baidu map code here
-					                  break;
-				               default:
-				                    break;
-				            }
-						}
-					})
-					.show();
+					showControlOptions();
 				}
 	     	
 	    });
@@ -434,8 +405,7 @@ public class WheelchairActivity extends Activity {
 					{
 						if(speedChange==-1)
 						{
-							speedChange+=1;
-							showSpeed(speedChange);
+ 							initialSpeedBoost();
 						}
 						Log.d("TAG", "Move forward");
 						sendData(FORWARD+""); 
@@ -455,6 +425,10 @@ public class WheelchairActivity extends Activity {
 							&& bitmap_left.getPixel(X, Y)<0 
 							&& bitmap_right.getPixel(X, Y)==0)
 					{
+						if(speedChange==-1)
+						{
+							initialSpeedBoost();
+						}
 						//Log.d("TAG", "Turn left");
 						sendData(LEFT+"");
 						Toast.makeText(mContext, "LEFT", Toast.LENGTH_SHORT).show();
@@ -464,6 +438,10 @@ public class WheelchairActivity extends Activity {
 							&& bitmap_left.getPixel(X, Y)==0 
 							&& bitmap_right.getPixel(X, Y)<0)
 					{
+						if(speedChange==-1)
+						{
+							initialSpeedBoost();
+						}
 						//Log.d("TAG", "Turn right");
 						sendData(RIGHT+"");
 						Toast.makeText(mContext, "RIGHT", Toast.LENGTH_SHORT).show();
@@ -472,6 +450,8 @@ public class WheelchairActivity extends Activity {
 					{
 						Log.d("TAG","Stop");
 						sendData(STOP+"");
+						speedChange = -1;						
+						showSpeed(speedChange);
 						Toast.makeText(mContext, "STOP", Toast.LENGTH_SHORT).show();
 					}
 				}
@@ -583,7 +563,7 @@ public class WheelchairActivity extends Activity {
 						(accZ-lastAccZ)*(accZ-lastAccZ);
 				if(Math.sqrt(acc2) > 10 ){
 					Log.d(TAG, "Accident Stop or Fall");
-					sendData(STOP+"");
+//					sendData(STOP+"");
 									    
 				    alertDialog=new AlertDialog.Builder(WheelchairActivity.this)
 					     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -713,7 +693,7 @@ public class WheelchairActivity extends Activity {
                     if (distance >= 0.0 && distance < PROXIMITY_THRESHOLD) {
                         lastEvent = curTime;
                         Log.d(TAG, "Emergency Stop");
-                        sendData(STOP+""); 
+//                        sendData(STOP+""); 
                     }  
                 }  
             } 
@@ -909,22 +889,32 @@ public class WheelchairActivity extends Activity {
 			// TODO Auto-generated method stub
 			switch(msg.what){
 			case STOP:
+				speedChange = -1;
+				showSpeed(speedChange);
 				sendData(STOP+"");
 				Toast.makeText(mContext, "STOP", Toast.LENGTH_SHORT).show();
 				break;
 			case FORWARD:
+				speedChange = 0;
+				showSpeed(speedChange);
 				sendData(FORWARD+"");
 				Toast.makeText(mContext, "FORWARD", Toast.LENGTH_SHORT).show();
 				break;
 			case REVERSE:
+				speedChange = 0;
+				showSpeed(speedChange);
 				sendData(REVERSE+"");
 				Toast.makeText(mContext, "REVERSE", Toast.LENGTH_SHORT).show();
 				break;
 			case LEFT:
+				speedChange = 0;
+				showSpeed(speedChange);
 				sendData(LEFT+"");
 				Toast.makeText(mContext, "LEFT", Toast.LENGTH_SHORT).show();
 				break;
 			case RIGHT:
+				speedChange = 0;
+				showSpeed(speedChange);
 				sendData(RIGHT+"");
 				Toast.makeText(mContext, "RIGHT", Toast.LENGTH_SHORT).show();
 				break;
@@ -1109,7 +1099,7 @@ public class WheelchairActivity extends Activity {
 		case 4:
 			showSpeed.setImageDrawable(getResources().getDrawable(R.drawable.a6));
 			break;
-			default:
+		default:
 			break;
 		}
 		showSpeed.invalidate();
@@ -1143,31 +1133,31 @@ public class WheelchairActivity extends Activity {
 				if(s.equals("前进")||s.equals("向前")||s.equals("往前")||s.equals("朝前")){				
 					//go forward
 					sendData(FORWARD+"");
-					Toast.makeText(WheelchairActivity.this, "forward", Toast.LENGTH_SHORT).show();
+					Toast.makeText(WheelchairActivity.this, "FORWARD", Toast.LENGTH_SHORT).show();
 					break;
 				}
 				else if(s.equals("后退")){
 					//go backward
 					sendData(REVERSE+"");
-					Toast.makeText(WheelchairActivity.this, "backward", Toast.LENGTH_SHORT).show();
+					Toast.makeText(WheelchairActivity.this, "REVERSE", Toast.LENGTH_SHORT).show();
 					break;
 				}
                 else if(s.equals("左转")){
 					//turn left
                 	sendData(LEFT+"");
-                	Toast.makeText(WheelchairActivity.this, "left", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(WheelchairActivity.this, "LEFT", Toast.LENGTH_SHORT).show();
                 	break;
 				}
                 else if(s.equals("右转")){
 					//turn right
                 	sendData(RIGHT+"");
-                	Toast.makeText(WheelchairActivity.this, "right", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(WheelchairActivity.this, "RIGHT", Toast.LENGTH_SHORT).show();
                 	break;
 				}
                 else if(s.equals("停止")){
 					//stop
                 	sendData(STOP+"");
-                	Toast.makeText(WheelchairActivity.this, "stop", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(WheelchairActivity.this, "STOP", Toast.LENGTH_SHORT).show();
                 	break;
 				}
 			}
@@ -1495,7 +1485,7 @@ public class WheelchairActivity extends Activity {
     
     private void sendMMS(String phoneNumber, String message){
     	Log.d(TAG, "sendMMS");
-    	String SavePath = getSDCardPath()+"ScreenImages";  
+//    	String SavePath = getSDCardPath()+"ScreenImages";  
     	String filepath = "sdcard/xx.jpg";
 
     	Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1509,19 +1499,133 @@ public class WheelchairActivity extends Activity {
     	intent.setClassName("com.android.mms","com.android.mms.ui.ComposeMessageActivity");
     	startActivity(intent);
     }
+    
+    private void copyFileOrDir(String path) {
+    	 File sdcardDir = Environment.getExternalStorageDirectory();
+        AssetManager assetManager = this.getAssets();
+        String assets[] = null;
+        try {
+            Log.i("tag", "copyFileOrDir() "+path);
+            assets = assetManager.list(path);
+            if (assets.length == 0) {
+                copyFile(path);
+            } else {
+                String fullPath =  sdcardDir+"/Android/data/" + path;
+                Log.i("tag", "path="+fullPath);
+                File dir = new File(fullPath);
+                if (!dir.exists() && !path.startsWith("images") && !path.startsWith("sounds") && !path.startsWith("webkit"))
+                    if (!dir.mkdirs())
+                        Log.i("tag", "could not create dir "+fullPath);
+                for (int i = 0; i < assets.length; ++i) {
+                    String p;
+                    if (path.equals(""))
+                        p = "";
+                    else 
+                        p = path + "/";
+
+                    if (!path.startsWith("images") && !path.startsWith("sounds") && !path.startsWith("webkit"))
+                        copyFileOrDir( p + assets[i]);
+                }
+            }
+        } catch (IOException ex) {
+            Log.e("tag", "I/O Exception", ex);
+        }
+    }
+
+    private void copyFile(String filename) {
+        AssetManager assetManager = this.getAssets();
+        File sdcardDir = Environment.getExternalStorageDirectory();
+        InputStream in = null;
+        OutputStream out = null;
+        String newFileName = null;
+        try {
+            Log.i("tag", "copyFile() "+filename);
+            in = assetManager.open(filename);
+            if (filename.endsWith(".jpg")) // extension was added to avoid compression on APK file
+                newFileName = sdcardDir+"/Android/data/" + filename.substring(0, filename.length()-4);
+            else
+                newFileName = sdcardDir+"/Android/data/" + filename;
+            out = new FileOutputStream(newFileName);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+            out.flush();
+            out.close();
+            out = null;
+        } catch (Exception e) {
+            Log.e("tag", "Exception in copyFile() of "+newFileName);
+            Log.e("tag", "Exception in copyFile() "+e.toString());
+        }
+
+    }
     	/**
     	* 获取SDCard的目录路径功能
     	* @return
+    	 * @throws IOException 
     	*/
-    private String getSDCardPath(){
-    	File sdcardDir = null;
-    	//判断SDCard是否存在
-    	boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
-    	if(sdcardExist){
-    	    sdcardDir = Environment.getExternalStorageDirectory();
-    	}
-    	return sdcardDir.toString();
+    private String createVoicePackage() throws IOException{
+    	copyFileOrDir("");
+    	return "Voicepackage Downloaded";
     }
-
     
+    
+   
+    private void initialSpeedBoost()
+    {
+    	speedChange++;
+		showSpeed(speedChange);
+    }
+    private void showControlOptions()
+    {
+    	new AlertDialog.Builder(WheelchairActivity.this)
+        .setIcon(R.drawable.controlpanel)
+		.setTitle(R.string.controlOptions)
+		.setItems(R.array.select_dialog_items, 
+				new DialogInterface.OnClickListener() {
+			
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+	               case 0:  motionMode="Touch Sensing";
+			           		if(!alertJudge)
+			           		{
+			           			alertShow();
+			           		}
+			           		alertJudge=true;
+	                  break;
+	               case 1:  motionMode="Gravity Sensing";
+	       					Intent intent=new Intent(WheelchairActivity.this, GravitySensingActivity.class);
+	       					startActivity(intent);
+	                  break;
+	               case 2:  motionMode="Sip And Puff";
+			               	if(!alertJudge)
+			           		{
+			           			alertShow();
+			           		}
+			           		alertJudge=true;
+	                  break;
+	               case 3:  motionMode="Voice Control";
+			           		if(!alertJudge)
+			           		{
+			           			alertShow();
+			           		}
+			           		alertJudge=true;
+			           		//语音识别检测 
+			           		Intent voice_intent=new Intent();
+			           		voice_intent.setClass(WheelchairActivity.this, PocketSphinxDemo.class);
+							WheelchairActivity.this.startActivity(voice_intent);
+		                  break;
+	               case 4:  //TODO: Insert Baidu map code here
+		                  break;
+	               default:
+	                    break;
+	            }
+			}
+		})
+		.show();
+    }
 }
