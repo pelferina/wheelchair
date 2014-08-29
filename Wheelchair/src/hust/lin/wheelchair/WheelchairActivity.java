@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -29,8 +30,11 @@ import android.os.SystemClock;
 import hust.lin.pocketsphinx.PocketSphinxDemo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -201,6 +205,15 @@ public class WheelchairActivity extends Activity {
         {
         	Toast.makeText(this, "GPS is working...", Toast.LENGTH_LONG).show();
         }
+        try {
+			Toast.makeText(this, createVoicePackage(),Toast.LENGTH_LONG).show();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         criteria=new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setAltitudeRequired(true);
@@ -392,7 +405,7 @@ public class WheelchairActivity extends Activity {
 					{
 						if(speedChange==-1)
 						{
-							initialSpeedBoost();
+ 							initialSpeedBoost();
 						}
 						Log.d("TAG", "Move forward");
 						sendData(FORWARD+""); 
@@ -456,6 +469,7 @@ public class WheelchairActivity extends Activity {
 		// TODO Auto-generated method stub
 		Log.e(TAG, "++ On Resume ++");
 		super.onResume();
+		motionMode="";
 		mSensorManager.registerListener(mAccSensorEventListener, mAccSensor,
 				SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(mMagSensorEventListener, mMagSensor, 
@@ -1472,7 +1486,7 @@ public class WheelchairActivity extends Activity {
     
     private void sendMMS(String phoneNumber, String message){
     	Log.d(TAG, "sendMMS");
-    	String SavePath = getSDCardPath()+"ScreenImages";  
+//    	String SavePath = getSDCardPath()+"ScreenImages";  
     	String filepath = "sdcard/xx.jpg";
 
     	Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1486,18 +1500,78 @@ public class WheelchairActivity extends Activity {
     	intent.setClassName("com.android.mms","com.android.mms.ui.ComposeMessageActivity");
     	startActivity(intent);
     }
+    
+    private void copyFileOrDir(String path) {
+    	 File sdcardDir = Environment.getExternalStorageDirectory();
+        AssetManager assetManager = this.getAssets();
+        String assets[] = null;
+        try {
+            Log.i("tag", "copyFileOrDir() "+path);
+            assets = assetManager.list(path);
+            if (assets.length == 0) {
+                copyFile(path);
+            } else {
+                String fullPath =  sdcardDir+"/Android/data/" + path;
+                Log.i("tag", "path="+fullPath);
+                File dir = new File(fullPath);
+                if (!dir.exists() && !path.startsWith("images") && !path.startsWith("sounds") && !path.startsWith("webkit"))
+                    if (!dir.mkdirs())
+                        Log.i("tag", "could not create dir "+fullPath);
+                for (int i = 0; i < assets.length; ++i) {
+                    String p;
+                    if (path.equals(""))
+                        p = "";
+                    else 
+                        p = path + "/";
+
+                    if (!path.startsWith("images") && !path.startsWith("sounds") && !path.startsWith("webkit"))
+                        copyFileOrDir( p + assets[i]);
+                }
+            }
+        } catch (IOException ex) {
+            Log.e("tag", "I/O Exception", ex);
+        }
+    }
+
+    private void copyFile(String filename) {
+        AssetManager assetManager = this.getAssets();
+        File sdcardDir = Environment.getExternalStorageDirectory();
+        InputStream in = null;
+        OutputStream out = null;
+        String newFileName = null;
+        try {
+            Log.i("tag", "copyFile() "+filename);
+            in = assetManager.open(filename);
+            if (filename.endsWith(".jpg")) // extension was added to avoid compression on APK file
+                newFileName = sdcardDir+"/Android/data/" + filename.substring(0, filename.length()-4);
+            else
+                newFileName = sdcardDir+"/Android/data/" + filename;
+            out = new FileOutputStream(newFileName);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+            out.flush();
+            out.close();
+            out = null;
+        } catch (Exception e) {
+            Log.e("tag", "Exception in copyFile() of "+newFileName);
+            Log.e("tag", "Exception in copyFile() "+e.toString());
+        }
+
+    }
     	/**
     	* 获取SDCard的目录路径功能
     	* @return
+    	 * @throws IOException 
     	*/
-    private String getSDCardPath(){
-    	File sdcardDir = null;
-    	//判断SDCard是否存在
-    	boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
-    	if(sdcardExist){
-    	    sdcardDir = Environment.getExternalStorageDirectory();
-    	}
-    	return sdcardDir.toString();
+    private String createVoicePackage() throws IOException{
+    	copyFileOrDir("");
+    	return "Voicepackage Downloaded";
     }
     private void initialSpeedBoost()
     {
@@ -1538,16 +1612,10 @@ public class WheelchairActivity extends Activity {
 			           			alertShow();
 			           		}
 			           		alertJudge=true;
-			           		
-			           		//语音识别检测
-		                   PackageManager pm = getPackageManager(); 
-		                   List activities = pm.queryIntentActivities( 
-		                   new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0); 
-		                   if(activities.size() != 0) {  
-		                   	startVoiceRecognition();
-		                   }else{
-		                   	Toast.makeText(WheelchairActivity.this, "Recognizer not present", Toast.LENGTH_SHORT).show();
-		                   }  
+			           		//语音识别检测 
+			           		Intent voice_intent=new Intent();
+			           		voice_intent.setClass(WheelchairActivity.this, PocketSphinxDemo.class);
+							WheelchairActivity.this.startActivity(voice_intent);
 		                  break;
 	               case 4:  //TODO: Insert Baidu map code here
 		                  break;
