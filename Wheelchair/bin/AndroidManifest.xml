@@ -71,18 +71,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--
+
         <activity
-            android:name="hust.lin.wheelchair.MapActivity"
+            android:name="wpi.ayesha.nutiteqmaps.GraphhopperRouteActivity"
             android:label="@string/map" 
             android:screenOrientation="landscape" >
         </activity>
-        <activity
-            android:name="hust.lin.wheelchair.OfflineMapActivity"
-            android:label="@string/map"
-            android:screenOrientation="landscape" >
-        </activity>
--->
+
         <activity
             android:name="hust.lin.wheelchair.GravitySensingActivity"
             android:label="@string/gravity_sensor"

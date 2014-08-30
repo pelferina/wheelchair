@@ -26,7 +26,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
-
 import hust.lin.pocketsphinx.PocketSphinxDemo;
 
 import java.io.File;
@@ -43,6 +42,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import wpi.ayesha.nutiteqmaps.GraphhopperRouteActivity;
 import hust.lin.R;
 
 //import com.baidu.mapapi.BMapManager;
@@ -54,7 +54,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.speech.SpeechRecognizer;  
 import android.speech.RecognitionListener;
-
 import android.speech.RecognizerIntent;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
@@ -75,7 +74,6 @@ import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import android.speech.srec.Recognizer;  
 import android.speech.srec.MicrophoneInputStream;
 
@@ -455,7 +453,7 @@ public class WheelchairActivity extends Activity {
 						Toast.makeText(mContext, "STOP", Toast.LENGTH_SHORT).show();
 					}
 				}
-				else if(motionMode=="Sip And Puff")
+				else if(motionMode=="Gesture Control")
 				{
 					return mGestureDetector.onTouchEvent(event);
 				}
@@ -531,7 +529,7 @@ public class WheelchairActivity extends Activity {
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
 	    // TODO Auto-generated method stub
-		if(motionMode=="Sip And Puff"){
+		if(motionMode=="Gesture Control"){
 			return mGestureDetector.onTouchEvent(event); 
 		}
 		else{
@@ -1025,8 +1023,8 @@ public class WheelchairActivity extends Activity {
 	}
 	
 	private void actionClickMenuItem4(){
-		Log.d(TAG, "Sip And Puff");
-		motionMode="Sip And Puff";
+		Log.d(TAG, "Gesture Control");
+		motionMode="Gesture Control";
 		if(!alertJudge)
 		{
 			alertShow();
@@ -1599,7 +1597,7 @@ public class WheelchairActivity extends Activity {
 	       					Intent intent=new Intent(WheelchairActivity.this, GravitySensingActivity.class);
 	       					startActivity(intent);
 	                  break;
-	               case 2:  motionMode="Sip And Puff";
+	               case 2:  motionMode="Gesture Control";
 			               	if(!alertJudge)
 			           		{
 			           			alertShow();
@@ -1617,7 +1615,10 @@ public class WheelchairActivity extends Activity {
 			           		voice_intent.setClass(WheelchairActivity.this, PocketSphinxDemo.class);
 							WheelchairActivity.this.startActivity(voice_intent);
 		                  break;
-	               case 4:  //TODO: Insert Baidu map code here
+	               case 4:  motionMode="GPS Navigation";
+	            	   		Intent gps_intent=new Intent();
+	            	   		gps_intent.setClass(WheelchairActivity.this, GraphhopperRouteActivity.class);
+							WheelchairActivity.this.startActivity(gps_intent);
 		                  break;
 	               default:
 	                    break;

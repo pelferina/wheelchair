@@ -203,8 +203,8 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 			Log.d(TAG, "SPEED UP");
 			sendData(5+"");
 		}
-		else if(hyp.equals("SLOW DOWN")){
-			Log.d(TAG, "SPEED UP");
+		else if(hyp.equals("SPEED DOWN")  || hyp.equals("SLOW DOWN")){
+			Log.d(TAG, "SPEED DOWN");
 			sendData(5+"");
 		}
 		else{

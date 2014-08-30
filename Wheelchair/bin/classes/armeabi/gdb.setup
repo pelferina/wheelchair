@@ -1,2 +1,0 @@
-set solib-search-path D:/Java/sphinx/PocketSphinxAndroidDemo/obj/local/armeabi
-directory D:/Java/android-ndk-r9c/platforms/android-9/arch-arm/usr/include D:/Java/sphinx/sphinxbase/include/android D:/Java/sphinx/pocketsphinx/include D:/Java/sphinx/pocketsphinx/src/libpocketsphinx D:/Java/sphinx/PocketSphinxAndroidDemo/jni D:/Java/sphinx/sphinxbase/src/libsphinxbase/fe D:/Java/sphinx/sphinxbase/src/libsphinxbase/feat D:/Java/sphinx/sphinxbase/src/libsphinxbase/lm D:/Java/sphinx/sphinxbase/src/libsphinxbase/util D:/Java/android-ndk-r9c/sources/cxx-stl/system
