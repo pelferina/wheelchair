@@ -102,7 +102,12 @@ public class GraphhopperRouteActivity extends Activity implements RouteActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // Register license, do it before creating any MapView instances
+        if(MapView.registerLicense("XTUMwQ0ZIWHRqUmdUTnFDdlBPQlZCdnJ3b2lNUVpTbDZBaFVBbm1leXRlaUVoYVhqek44ZkFRakxFQ1FPWCtNPQoKcGFja2FnZU5hbWU9aHVzdC5saW4Kd2F0ZXJtYXJrPU9TTQoK", getApplicationContext())){
+            Log.info("license ok");
+        }else{
+            Log.error("license not accepted");
+        }
         setContentView(R.layout.map);
 
         Log.enableAll();
