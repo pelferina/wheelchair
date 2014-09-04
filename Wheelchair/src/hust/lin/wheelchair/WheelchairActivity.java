@@ -935,8 +935,8 @@ public class WheelchairActivity extends Activity {
 //		menu.add(0,Item3, 0, "Gravity Sensing");
 //		menu.add(2,Item4, 0, "Gesture Control");
 //		menu.add(2,Item5, 0, "Voice Control");
-		menu.findItem(Item0).setIcon(R.drawable.speed);
-		menu.findItem(Item1).setIcon(R.drawable.slow);
+		menu.findItem(Item0).setIcon(R.drawable.help);
+		menu.findItem(Item1).setIcon(R.drawable.settings);
 //		menu.findItem(Item2).setIcon(drawable.ic_menu_slideshow);
 //		menu.findItem(Item3).setIcon(drawable.ic_menu_compass);
 //		menu.findItem(Item4).setIcon(drawable.ic_menu_directions);
